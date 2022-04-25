@@ -7,9 +7,9 @@ type TexViwerProps = {
   expression: string
 }
 const TexViwer = (props:TexViwerProps) => {
-    return (<MathJaxSvg fontSize={40} fontCache={true}>
-        {'$$'+props.expression+'$$'}
-    </MathJaxSvg>);
+  return (<MathJaxSvg fontSize={40} fontCache={true}>
+      {'$$'+props.expression+'$$'}
+  </MathJaxSvg>);
 };
 
 export default TexViwer;

@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { MotiView, AnimatePresence } from 'moti'
 import { StyleSheet, Text, View, Button, TouchableOpacity } from 'react-native';
-
-// import TexViwer from '../components/TexViwerWeb';
+import { LinearGradient } from 'expo-linear-gradient';
+import { MathJaxSvg } from 'react-native-mathjax-html-to-svg';
 import TexViwer from '../components/TexViwerIos';
+
+// import parser from '../parser/expressionParser';
+const parser = require("../parser/expressionParser");
 
 const gcd:any = (x:number, y:number) => {return (x % y) ? gcd(y, x % y) : y;}
 
@@ -90,7 +93,7 @@ const Calculator = () => {
 
         // 一つ前が演算子
         // 後に続くもの: 0、数字（0を除く）
-        } else if (["\\otimes", "\\oplus"].includes(prev_last_term[0])) {
+        } else if (["\\otimes", "\\text{Hom}", "\\text{Tor}", "\\text{Ext}"].includes(prev_last_term[0])) {
             if (char==="0") {
                 prev_term_list.push([char]);
                 setTermList(prev_term_list);
@@ -131,7 +134,11 @@ const Calculator = () => {
             let eval_result:string = "";
             if (target_oper==="\\otimes") {
                 eval_result = gcd(first_term_nat_num,second_term_nat_num).toString();
-            } else if (target_oper==="\\oplus") {
+            } else if (target_oper==="\\text{Home}") {
+                eval_result = (first_term_nat_num * second_term_nat_num).toString();
+            } else if (target_oper==="\\text{Tor}") {
+                eval_result = (first_term_nat_num * second_term_nat_num).toString();
+            } else if (target_oper==="\\text{Ext}") {
                 eval_result = (first_term_nat_num * second_term_nat_num).toString();
             } else {
                 console.error("error");
@@ -149,11 +156,6 @@ const Calculator = () => {
         }
         return prev_term_list;
     }
-    const eval_expression_as_canonical = () => {
-        // console.log("result_term_list:",term_list);
-        let prev_term_list = term_list;
-        let prev_last_term = prev_term_list[prev_term_list.length-1];
-    }
 
     const handleOnPressEval = () => {
         try {
@@ -169,20 +171,36 @@ const Calculator = () => {
 
     return (<View style={styles.container}>
         <View style={{flex: 1}}>
-            <View style={styles.title}><TexViwer expression={"\\mathrm{Tensor Calculator}"}/></View>
-        </View>
-        <View style={{flex: 3}}>
-            <View style={styles.resultScreen}>
-                <TexViwer expression={expression} />
+            <View style={styles.title}>
+              <TexViwer expression={"\\mathrm{Tensor Calculator}"}/>
             </View>
         </View>
+        <View style={{flex: 3}}>
+          <LinearGradient
+            colors={['#000', '#444', '#555']}
+            start={{x: 0.0, y: 1.0}}
+            end={{x: 1.0, y: 0.0}}
+            style={styles.resultScreen}>
+            <MathJaxSvg fontSize={40} fontCache={true} color="white">
+              {'$$'+expression+'$$'}
+            </MathJaxSvg>
+          </LinearGradient>
+        </View>
         <View style={{flex: 6}}>
-            {/* <View style={{flex: 1, flexDirection: "row"}}>
-                <View style={styles.calculation}></View>
-                <View style={styles.calculation}></View>
-                <View style={styles.calculation}></View>
-                <View style={styles.calculation}></View>
-            </View> */}
+            <View style={{flex: 1, flexDirection: "row"}}>
+                <TouchableOpacity style={styles.calculation} onPress={()=>{}}>
+                        <TexViwer expression={"("}/>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.calculation} onPress={()=>{}}>
+                        <TexViwer expression={")"}/>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.calculation} onPress={()=>{}}>
+                        <TexViwer expression={"\\mathbb{Z}"}/>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.calculation} onPress={init_expression}>
+                    <TexViwer expression={"\\text{C}"}/>
+                    </TouchableOpacity>
+                </View>
             <View style={{flex: 1, flexDirection: "row"}}>
                 <TouchableOpacity style={styles.calculation} onPress={()=>{add_char("7")}}>
                     <TexViwer expression={"7"}/>
@@ -193,8 +211,8 @@ const Calculator = () => {
                 <TouchableOpacity style={styles.calculation} onPress={()=>{add_char("9")}}>
                     <TexViwer expression={"9"}/>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.calculation} onPress={init_expression}>
-                <TexViwer expression={"\\text{C}"}/>
+                <TouchableOpacity style={styles.calculation} onPress={()=>{add_char("\\otimes")}}>
+                    <TexViwer expression={"\\otimes"}/>
                 </TouchableOpacity>
             </View>
             <View style={{flex: 1, flexDirection: "row"}}>
@@ -207,8 +225,8 @@ const Calculator = () => {
                 <TouchableOpacity style={styles.calculation} onPress={()=>{add_char("6")}}>
                     <TexViwer expression={"6"}/>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.calculation} onPress={()=>{add_char("\\otimes")}}>
-                    <TexViwer expression={"\\otimes"}/>
+                <TouchableOpacity style={styles.calculation} onPress={()=>{}}>
+                    <TexViwer expression={"\\text{Hom}"}/>
                 </TouchableOpacity>
             </View>
             <View style={{flex: 1, flexDirection: "row"}}>
@@ -221,8 +239,8 @@ const Calculator = () => {
                 <TouchableOpacity style={styles.calculation} onPress={()=>{add_char("3")}}>
                     <TexViwer expression={"3"}/>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.calculation} onPress={()=>{add_char("\\oplus")}}>
-                    <TexViwer expression={"\\oplus"}/>
+                <TouchableOpacity style={styles.calculation} onPress={()=>{}}>
+                    <TexViwer expression={"\\text{Tor}"}/>
                 </TouchableOpacity>
             </View>
             <View style={{flex: 1, flexDirection: "row"}}>
@@ -230,45 +248,11 @@ const Calculator = () => {
                     <TexViwer expression={"0"}/>
                 </TouchableOpacity>
                 <View style={styles.calculation}></View>
-                <View style={styles.calculation}></View>
-                {/* <AnimatePresence> */}
-                    {/* <MotiView
-                        from={{
-                            opacity: 0,
-                            scale: 0.9,
-                        }}
-                        animate={{
-                            opacity: 1,
-                            scale: 1,
-                        }}
-                        exit={{
-                            opacity: 0,
-                            scale: 0.9,
-                        }}
-                        style={styles.calculation}
-                    /> */}
-                {/* </AnimatePresence> */}
-                {/* <MotiView
-                    from={{
-                        opacity: 0,
-                        scale: 0.9,
-                    }}
-                    animate={{
-                        opacity: 1,
-                        scale: 1,
-                    }}
-                    exit={{
-                        opacity: 0,
-                        scale: 0.9,
-                    }}
-                    style={styles.calculation}
-                /> */}
-                {/* <TouchableOpacity style={styles.calculation} onPress={eval_expression_as_canonical}>
-                    <TexViwer expression={"\\cong"}/>
-                    <Text>標準形</Text>
-                </TouchableOpacity> */}
                 <TouchableOpacity style={styles.calculation} onPress={handleOnPressEval}>
                     <TexViwer expression={"\\cong"}/>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.calculation} onPress={()=>{}}>
+                    <TexViwer expression={"\\text{Ext}"}/>
                 </TouchableOpacity>
             </View>
         </View>
@@ -299,11 +283,11 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: "white",
         backgroundColor: "#eee",
-        backgroundImage: "linear-gradient(45deg, #000, #111, #222 50%, #444)",
+        // backgroundImage: "linear-gradient(45deg, #000, #111, #222 50%, #444)",
         alignItems: "center",
         justifyContent: 'center',
         fontSize: 36,
-        color: "white",
+        // color: "white",
     },
     calculation: {
         margin: 3,
@@ -312,7 +296,7 @@ const styles = StyleSheet.create({
         borderRadius: 3,
         borderColor: "white",
         backgroundColor: "#fff",
-        backgroundImage: "linear-gradient(45deg, #25aae1, #4481eb, #3f86ed)",
+        // backgroundImage: "linear-gradient(45deg, #25aae1, #4481eb, #3f86ed)",
         backgroundSize: "300% 100%",
         alignItems: "center",
         justifyContent: 'center',
@@ -320,7 +304,7 @@ const styles = StyleSheet.create({
         opacity: .95,
         // color: "var(--glow-color)",
         // boxShadow: "0 4px 15px 0 rgba(65, 132, 234, 0.75)",
-        color: "#fff",
+        // color: "#fff",
         // transition: "all 0.3s",
         // boxShadow: "0 0.625em 1em 0 rgba(30, 143, 255, 0.35)",
     },
