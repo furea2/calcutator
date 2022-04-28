@@ -38,7 +38,7 @@ const Calculator = () => {
             } else if ("\\mathbb{Z}"===char) {
                 prev_term_list = ["Group", 1, 0];
             } else if (["\\otimes", "\\text{Hom}"].includes(char)) {
-                prev_term_list = [char, ["Group", 0, 1], []];
+                prev_term_list = [char, ["Zero"], []];
             } else {
                 error_expression();
                 return;
@@ -68,6 +68,7 @@ const Calculator = () => {
             // 後に続くもの: 数字、演算子
             if (prev_term_list[2]>0) {
                 if (["\\otimes", "\\text{Hom}"].includes(char)) {
+                    if (prev_term_list[2]===1) {prev_term_list=["Zero"]}
                     prev_term_list = [char, prev_term_list, []];
                 } else if (/[0-9]/.test(char)) {
                     prev_term_list[2] = Number(prev_term_list[2].toString()+char);
@@ -192,6 +193,7 @@ const Calculator = () => {
 
     const eval_term_list = (prev_term_list:any) => {
         let _type = prev_term_list[0];
+        let result:any[] = [];
         if (["\\otimes","\\text{Hom}"].includes(_type)) {
             let oper = prev_term_list[0];
             let lhs = prev_term_list[1];
@@ -207,40 +209,48 @@ const Calculator = () => {
 
             if (oper==="\\otimes") {
                 if (lhs[2]===1 || rhs[2]===1) {
-                    return ["Group", 0, 1];
+                    result = ["Zero"];
                 } else if (lhs[2]===0) {
-                    return rhs;
+                    result = rhs;
                 } else if (rhs[2]===0) {
-                    return lhs;
+                    result = lhs;
                 } else {
-                    return ["Group", 0, gcd(lhs[2], rhs[2])];
+                    result = ["Group", 0, gcd((lhs[2]), rhs[2])];
                 }
 
             } else if (oper==="\\text{Hom}") {
                 if (lhs[2]===1 || rhs[2]===1) {
-                    return ["Group", 0, 1];
+                    result = ["Zero"];
                 } else if (lhs[2]===0) {
-                    return rhs;
+                    result = rhs;
                 } else if (rhs[2]===0) {
                     if (lhs[2]===0) {
-                        return lhs;
+                        result = lhs;
                     } else {
-                        return ["Group", 0, 1];
+                        result = ["Zero"];
                     }
                 } else {
-                    return ["Group", 0, gcd(lhs[2], rhs[2])];
+                    result = ["Group", 0, gcd(lhs[2], rhs[2])];
                 }
             }
         } else if (_type==="Zero") {
-            return prev_term_list;
+            result = prev_term_list;
         } else if (_type==="Group") {
             if (prev_term_list[2]===1) {
-                return ["Zero"];
+                result = ["Zero"];
             } else {
-                return prev_term_list;
+                result = prev_term_list;
             }
         } else {
             console.error("error");
+            error_expression();
+            return;
+        }
+
+        if (result.length!=0) {
+            return result;
+        } else {
+            console.error("eval result undefined error");
             error_expression();
             return;
         }
@@ -296,7 +306,8 @@ const Calculator = () => {
         try {
             const prev_term_list = eval_term_list(term_list);
             create_expression(prev_term_list);
-            setIsInitialized(true);
+            // setExpression(prev_term_list)
+            // setIsInitialized(true);
         } catch {
             console.error("error");
             error_expression();
@@ -343,7 +354,7 @@ const Calculator = () => {
                 <CalcButton onPress={()=>{add_char("0")}} char={"0"}/>
                 <CalcButton char={""}/>
                 <CalcButton onPress={()=>{add_char("\\mathbb{Z}")}} char={"\\mathbb{Z}"}/>
-                <CalcButton onPress={()=>{add_char("\\cong")}} char={"\\cong"}/>
+                <CalcButton onPress={handleOnPressEval} char={"\\cong"}/>
             </View>
         </View>
     </View>);
