@@ -307,7 +307,7 @@ const Calculator = () => {
             const prev_term_list = eval_term_list(term_list);
             create_expression(prev_term_list);
             // setExpression(prev_term_list)
-            // setIsInitialized(true);
+            setIsInitialized(true);
         } catch {
             console.error("error");
             error_expression();
