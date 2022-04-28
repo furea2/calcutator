@@ -215,7 +215,12 @@ const Calculator = () => {
                 } else if (rhs[2]===0) {
                     result = lhs;
                 } else {
-                    result = ["Group", 0, gcd((lhs[2]), rhs[2])];
+                    let _gcd = gcd((lhs[2]), rhs[2]);
+                    if (_gcd===1) {
+                        result = ["Zero"];
+                    } else {
+                        result = ["Group", 0, _gcd];
+                    }
                 }
 
             } else if (oper==="\\text{Hom}") {
@@ -230,7 +235,12 @@ const Calculator = () => {
                         result = ["Zero"];
                     }
                 } else {
-                    result = ["Group", 0, gcd(lhs[2], rhs[2])];
+                    let _gcd = gcd((lhs[2]), rhs[2]);
+                    if (_gcd===1) {
+                        result = ["Zero"];
+                    } else {
+                        result = ["Group", 0, _gcd];
+                    }
                 }
             }
         } else if (_type==="Zero") {
@@ -305,8 +315,8 @@ const Calculator = () => {
     const handleOnPressEval = () => {
         try {
             const prev_term_list = eval_term_list(term_list);
+            setTermList(prev_term_list);
             create_expression(prev_term_list);
-            // setExpression(prev_term_list)
             setIsInitialized(true);
         } catch {
             console.error("error");
