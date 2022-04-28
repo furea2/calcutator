@@ -1,83 +1,95 @@
 import React, { useState, useEffect } from 'react';
-import { MotiView, AnimatePresence } from 'moti'
-import { StyleSheet, Text, View, Button, TouchableOpacity } from 'react-native';
+import { View, AnimatePresence } from 'moti'
+import { StyleSheet, Text, Button, TouchableOpacity } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { MathJaxSvg } from 'react-native-mathjax-html-to-svg';
-import TexViwer from '../components/TexViwerIos';
-
-// import parser from '../parser/expressionParser';
-const parser = require("../parser/expressionParser");
+import TexViwer from '../components/TexViwer';
+import ScreenViwer from '../components/ScreenViwer';
+import CalcButton from '../components/CalcButton';
 
 const gcd:any = (x:number, y:number) => {return (x % y) ? gcd(y, x % y) : y;}
 
 const Calculator = () => {
+    const init_term_list = ["Zero"];
+    const init_expression:string = "0";
     const [is_initialized, setIsInitialized] = useState(true);
-    const [term_list, setTermList] = useState<string[][]>([["0"],]);
-    const [expression, setExpression] = useState("0");
-
-    const init_expression = () => {
-        let prev_term_list:[[string]] = [["0"],];
-        setTermList(prev_term_list);
-        setExpression(prev_term_list.join(" "));
+    const [term_list, setTermList] = useState<any>(init_term_list);
+    const [expression, setExpression] = useState(init_expression);
+    
+    const initialize_expression = () => {
+        setTermList(init_term_list);
+        setExpression(init_expression);
         setIsInitialized(true);
     }
     const error_expression = () => {
-        init_expression()
+        initialize_expression()
         setExpression("ERROR");
     }
     const add_char = (char:string) => {
         let prev_term_list = term_list;
-        let prev_last_term = prev_term_list[prev_term_list.length-1];
-        if (["\\otimes", "\\oplus"].includes(char) && prev_term_list.length===3) {
-            prev_term_list = eval_expression();
-            prev_last_term = prev_term_list[prev_term_list.length-1];
-        }
+        // let result_term_list:string;
 
         // 初期化された状態
         // 後に続くもの: 0、数字（0を除く）、演算子
         if (is_initialized) {
             if (char==="0") {
                 ;
-            } else if (/[0-9]/.test(char)) {
-                prev_term_list[0] = ["\\mathbb{Z}/", char, "\\mathbb{Z}"];
-                setTermList(prev_term_list);
-            } else if (["\\otimes", "\\oplus"].includes(char)) {
-                prev_term_list.push([char]);
-                setTermList(prev_term_list);
+            } else if (/[1-9]/.test(char)) {
+                prev_term_list = ["Group", 0, Number(char)];
+            } else if ("\\mathbb{Z}"===char) {
+                prev_term_list = ["Group", 1, 0];
+            } else if (["\\otimes", "\\text{Hom}"].includes(char)) {
+                prev_term_list = [char, ["Group", 0, 1], []];
             } else {
                 error_expression();
                 return;
             }
+            setTermList(prev_term_list);
 
+        // 一つ前が自明群
+        // 後に続くもの: 演算子
+        } else if ("Zero"===prev_term_list[0]) {
+            if (["\\otimes", "\\text{Hom}"].includes(char)) {
+                prev_term_list = [char, ["Zero"], []];
+            } else if (char==="0") {
+                ;
+            } else if (/[1-9]/.test(char)) {
+                prev_term_list = ["Group", 0, Number(char)];
+            } else if (char==="\\mathbb{Z}") {
+                prev_term_list = ["Group", 1, 0];
+            } else {
+                console.error("error");
+                console.error("一つ前が自明群");
+                error_expression();
+                return;
+            }
         // 一つ前が群
-        } else if (["\\mathbb{Z}/", "0"].includes(prev_last_term[0])) {
-            // 一つ前が自明群
-            // 後に続くもの: 演算子
-            if (prev_last_term[0]==="0") {
-                if (["\\otimes", "\\oplus"].includes(char)) {
-                    prev_term_list.push([char]);
-                    setTermList(prev_term_list);
-                } else if (char==="0") {
-                    ;
+        } else if ("Group"===prev_term_list[0]) {
+            // 一つ前が有限群
+            // 後に続くもの: 数字、演算子
+            if (prev_term_list[2]>0) {
+                if (["\\otimes", "\\text{Hom}"].includes(char)) {
+                    prev_term_list = [char, prev_term_list, []];
                 } else if (/[0-9]/.test(char)) {
-                    prev_term_list[prev_term_list.length-1] = ["\\mathbb{Z}/", char, "\\mathbb{Z}"];
-                    setTermList(prev_term_list);
+                    prev_term_list[2] = Number(prev_term_list[2].toString()+char);
+                } else if (char==="\\mathbb{Z}") {
+                    prev_term_list = ["Group", 1, 0];
                 } else {
                     console.error("error");
-                    console.error("一つ前が自明群");
+                    console.error("一つ前が有限群");
                     error_expression();
                     return;
                 }
-
-            // 一つ前が位数2以上の群
+            // 一つ前が整数群
             // 後に続くもの: 数字、演算子
-            } else if (prev_last_term[0]==="\\mathbb{Z}/") {
-                if (["\\otimes", "\\oplus"].includes(char)) {
-                    prev_term_list.push([char]);
-                    setTermList(prev_term_list);
-                } else if (/[0-9]/.test(char)) {
-                    prev_last_term[1]+=char;
-                    setTermList(prev_term_list);
+            } else if (prev_term_list[2]===0) {
+                if (["\\otimes", "\\text{Hom}"].includes(char)) {
+                    prev_term_list = [char, prev_term_list, []];
+                } else if ("0"===char) {
+                    prev_term_list = ["Zero"];
+                } else if (/[1-9]/.test(char)) {
+                    prev_term_list = ["Group", 0, Number(char)];
+                } else if (char==="\\mathbb{Z}") {
+                    ;
                 } else {
                     console.error("error");
                     console.error("一つ前が位数2以上の群");
@@ -92,19 +104,76 @@ const Calculator = () => {
             }
 
         // 一つ前が演算子
-        // 後に続くもの: 0、数字（0を除く）
-        } else if (["\\otimes", "\\text{Hom}", "\\text{Tor}", "\\text{Ext}"].includes(prev_last_term[0])) {
-            if (char==="0") {
-                prev_term_list.push([char]);
-                setTermList(prev_term_list);
-            } else if (/[0-9]/.test(char)) {
-                prev_term_list.push(["\\mathbb{Z}/", char, "\\mathbb{Z}"]);
-                setTermList(prev_term_list);
-            } else if (["\\otimes", "\\oplus"].includes(char)) {
-                prev_term_list[prev_term_list.length-1] = [char];
-                setTermList(prev_term_list);
+        // 後に続くもの: 0、数字（0を除く）、演算子
+        } else if (["\\otimes", "\\text{Hom}"].includes(prev_term_list[0])) {
+            // ２項目が未入力
+            if (prev_term_list[2].length===0) {
+                if (char==="0") {
+                    prev_term_list[2] = ["Zero"];
+                } else if (/[1-9]/.test(char)) {
+                    prev_term_list[2] = ["Group", 0, Number(char)];
+                } else if (char==="\\mathbb{Z}") {
+                    prev_term_list[2] = ["Group", 1, 0];
+                } else if (["\\otimes", "\\text{Hom}"].includes(char)) {
+                    prev_term_list[0] = char;
+                } else {
+                    console.error("error")
+                    console.error("一つ前が演算子");
+                    error_expression();
+                    return;
+                }
+
+            // ２項目が自明群
+            } else if (prev_term_list[2][0]==="Zero") {
+                if (char==="0") {
+                    ;
+                } else if (/[1-9]/.test(char)) {
+                    prev_term_list[2] = ["Group", 0, Number(char)];
+                } else if (char==="\\mathbb{Z}") {
+                    prev_term_list[2] = ["Group", 1, 0];
+                } else if (["\\otimes", "\\text{Hom}"].includes(char)) {
+                    prev_term_list = [char, eval_term_list(prev_term_list), []]
+                } else {
+                    console.error("error")
+                    console.error("一つ前が演算子");
+                    error_expression();
+                    return;
+                }
+
+            // ２項目が有限群
+            } else if (prev_term_list[2][2]>0) {
+                if (/[0-9]/.test(char)) {
+                    prev_term_list[2][2] = Number(prev_term_list[2][2].toString()+char);
+                } else if (char==="\\mathbb{Z}") {
+                    prev_term_list[2] = ["Group", 1, 0];
+                } else if (["\\otimes", "\\text{Hom}"].includes(char)) {
+                    prev_term_list = [char, eval_term_list(prev_term_list), []]
+                } else {
+                    console.error("error")
+                    console.error("一つ前が演算子");
+                    error_expression();
+                    return;
+                }
+
+            // ２項目が整数群
+            } else if (prev_term_list[2][2]===0) {
+                if (char==="0") {
+                    prev_term_list[2] = ["Zero"];
+                } else if (/[1-9]/.test(char)) {
+                    prev_term_list[2] = ["Group", 0, Number(char)];
+                } else if (char==="\\mathbb{Z}") {
+                    ;
+                } else if (["\\otimes", "\\text{Hom}"].includes(char)) {
+                    prev_term_list = [char, eval_term_list(prev_term_list), []]
+                } else {
+                    console.error("error")
+                    console.error("一つ前が演算子");
+                    error_expression();
+                    return;
+                }
+
             } else {
-                console.error("error")
+                console.error("error");
                 console.error("一つ前が演算子");
                 error_expression();
                 return;
@@ -116,52 +185,118 @@ const Calculator = () => {
             error_expression();
             return;
         }
-        // console.log("result_term_list:",prev_term_list);
-        let result_expression = (prev_term_list.map((l:string[])=>(l.join(" ")))).join(" ");
-        setExpression(result_expression);
+        setTermList(prev_term_list);
+        create_expression(prev_term_list);
         setIsInitialized(false);
     }
-    const eval_expression = () => {        
-        let prev_term_list = term_list;
-        if (term_list.length===1) {
-            if (term_list[0][1]==="1") {prev_term_list = [["0"]];}
-            setTermList(prev_term_list);
-            setExpression((prev_term_list.map((l:string[])=>(l.join(" ")))).join(" "));
-        } else if (term_list.length===3) {
-            const first_term_nat_num:number = Number(term_list[0][1]) || 1;
-            const target_oper:string = term_list[1][0];
-            const second_term_nat_num:number = Number(term_list[2][1]) || 1;
-            let eval_result:string = "";
-            if (target_oper==="\\otimes") {
-                eval_result = gcd(first_term_nat_num,second_term_nat_num).toString();
-            } else if (target_oper==="\\text{Home}") {
-                eval_result = (first_term_nat_num * second_term_nat_num).toString();
-            } else if (target_oper==="\\text{Tor}") {
-                eval_result = (first_term_nat_num * second_term_nat_num).toString();
-            } else if (target_oper==="\\text{Ext}") {
-                eval_result = (first_term_nat_num * second_term_nat_num).toString();
-            } else {
+
+    const eval_term_list = (prev_term_list:any) => {
+        let _type = prev_term_list[0];
+        if (["\\otimes","\\text{Hom}"].includes(_type)) {
+            let oper = prev_term_list[0];
+            let lhs = prev_term_list[1];
+            let rhs = prev_term_list[2];
+            if (rhs.length===0) {
                 console.error("error");
                 error_expression();
                 return;
             }
 
-            prev_term_list = eval_result==="1" ? [["0"]] : [["\\mathbb{Z}/",eval_result,"\\mathbb{Z}"]];
-            setTermList(prev_term_list);
-            setIsInitialized(true);
+            if (lhs[1]==="Zero") {lhs = ["Group", 0, 1]};
+            if (rhs[1]==="Zero") {rhs = ["Group", 0, 1]};
+
+            if (oper==="\\otimes") {
+                if (lhs[2]===1 || rhs[2]===1) {
+                    return ["Group", 0, 1];
+                } else if (lhs[2]===0) {
+                    return rhs;
+                } else if (rhs[2]===0) {
+                    return lhs;
+                } else {
+                    return ["Group", 0, gcd(lhs[2], rhs[2])];
+                }
+
+            } else if (oper==="\\text{Hom}") {
+                if (lhs[2]===1 || rhs[2]===1) {
+                    return ["Group", 0, 1];
+                } else if (lhs[2]===0) {
+                    return rhs;
+                } else if (rhs[2]===0) {
+                    if (lhs[2]===0) {
+                        return lhs;
+                    } else {
+                        return ["Group", 0, 1];
+                    }
+                } else {
+                    return ["Group", 0, gcd(lhs[2], rhs[2])];
+                }
+            }
+        } else if (_type==="Zero") {
+            return prev_term_list;
+        } else if (_type==="Group") {
+            if (prev_term_list[2]===1) {
+                return ["Zero"];
+            } else {
+                return prev_term_list;
+            }
         } else {
             console.error("error");
             error_expression();
             return;
         }
-        return prev_term_list;
+    }
+
+    const create_expression = (prev_term_list:any) => {
+        if (prev_term_list.length===0) {return "\\ "}
+        let result_expression:string;
+        let _type:string = prev_term_list[0];
+        if (["\\otimes","\\text{Hom}"].includes(_type)) {
+            let oper = prev_term_list[0];
+            let lhs = prev_term_list[1];
+            let rhs = prev_term_list[2];    
+            if (oper==="\\otimes") {
+                result_expression = (
+                    create_expression(lhs)
+                    + "\\otimes"
+                    + create_expression(rhs));
+            } else if (oper==="\\text{Hom}") {
+                result_expression = (
+                    "\\text{Hom}("
+                    + create_expression(lhs)
+                    + ","
+                    + create_expression(rhs)
+                    + ")");
+            } else {
+                console.error("error");
+                error_expression();
+                return;
+            }
+        } else if (_type==="Zero") {
+            result_expression = "0";
+        } else if (_type==="Group") {
+            if (prev_term_list[2]===0) {
+                result_expression = "\\mathbb{Z}";
+            } else if (prev_term_list[2]>0) {
+                result_expression = "\\mathbb{Z}/"+prev_term_list[2].toString()+"\\mathbb{Z}";
+            } else {
+                console.error("error");
+                error_expression();
+                return;
+            };
+        } else {
+            console.error("error");
+            error_expression();
+            return ;
+        }
+        setExpression(result_expression);
+        return result_expression;
     }
 
     const handleOnPressEval = () => {
         try {
-            const prev_term_list = eval_expression();
-            let result_expression = (prev_term_list.map((l:string[])=>(l.join(" ")))).join(" ");
-            setExpression(result_expression);
+            const prev_term_list = eval_term_list(term_list);
+            create_expression(prev_term_list);
+            setIsInitialized(true);
         } catch {
             console.error("error");
             error_expression();
@@ -170,6 +305,7 @@ const Calculator = () => {
     }
 
     return (<View style={styles.container}>
+        <View style={{height: 20}}></View>
         <View style={{flex: 1}}>
             <View style={styles.title}>
               <TexViwer expression={"\\mathrm{Tensor Calculator}"}/>
@@ -181,79 +317,33 @@ const Calculator = () => {
             start={{x: 0.0, y: 1.0}}
             end={{x: 1.0, y: 0.0}}
             style={styles.resultScreen}>
-            <MathJaxSvg fontSize={40} fontCache={true} color="white">
-              {'$$'+expression+'$$'}
-            </MathJaxSvg>
+            <ScreenViwer expression={expression}/>
           </LinearGradient>
         </View>
         <View style={{flex: 6}}>
             <View style={{flex: 1, flexDirection: "row"}}>
-                <TouchableOpacity style={styles.calculation} onPress={()=>{}}>
-                        <TexViwer expression={"("}/>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.calculation} onPress={()=>{}}>
-                        <TexViwer expression={")"}/>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.calculation} onPress={()=>{}}>
-                        <TexViwer expression={"\\mathbb{Z}"}/>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.calculation} onPress={init_expression}>
-                    <TexViwer expression={"\\text{C}"}/>
-                    </TouchableOpacity>
-                </View>
-            <View style={{flex: 1, flexDirection: "row"}}>
-                <TouchableOpacity style={styles.calculation} onPress={()=>{add_char("7")}}>
-                    <TexViwer expression={"7"}/>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.calculation} onPress={()=>{add_char("8")}}>
-                    <TexViwer expression={"8"}/>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.calculation} onPress={()=>{add_char("9")}}>
-                    <TexViwer expression={"9"}/>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.calculation} onPress={()=>{add_char("\\otimes")}}>
-                    <TexViwer expression={"\\otimes"}/>
-                </TouchableOpacity>
+                <CalcButton onPress={()=>{add_char("7")}} char={"7"}/>
+                <CalcButton onPress={()=>{add_char("8")}} char={"8"}/>
+                <CalcButton onPress={()=>{add_char("9")}} char={"9"}/>
+                <CalcButton onPress={initialize_expression} char={"\\text{C}"}/>
             </View>
             <View style={{flex: 1, flexDirection: "row"}}>
-                <TouchableOpacity style={styles.calculation} onPress={()=>{add_char("4")}}>
-                    <TexViwer expression={"4"}/>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.calculation} onPress={()=>{add_char("5")}}>
-                    <TexViwer expression={"5"}/>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.calculation} onPress={()=>{add_char("6")}}>
-                    <TexViwer expression={"6"}/>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.calculation} onPress={()=>{}}>
-                    <TexViwer expression={"\\text{Hom}"}/>
-                </TouchableOpacity>
+                <CalcButton onPress={()=>{add_char("4")}} char={"4"}/>
+                <CalcButton onPress={()=>{add_char("5")}} char={"5"}/>
+                <CalcButton onPress={()=>{add_char("6")}} char={"6"}/>
+                <CalcButton onPress={()=>{add_char("\\otimes")}} char={"\\otimes"}/>
             </View>
             <View style={{flex: 1, flexDirection: "row"}}>
-                <TouchableOpacity style={styles.calculation} onPress={()=>{add_char("1")}}>
-                    <TexViwer expression={"1"}/>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.calculation} onPress={()=>{add_char("2")}}>
-                    <TexViwer expression={"2"}/>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.calculation} onPress={()=>{add_char("3")}}>
-                    <TexViwer expression={"3"}/>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.calculation} onPress={()=>{}}>
-                    <TexViwer expression={"\\text{Tor}"}/>
-                </TouchableOpacity>
+                <CalcButton onPress={()=>{add_char("1")}} char={"1"}/>
+                <CalcButton onPress={()=>{add_char("2")}} char={"2"}/>
+                <CalcButton onPress={()=>{add_char("3")}} char={"3"}/>
+                <CalcButton onPress={()=>{add_char("\\text{Hom}")}} char={"\\text{Hom}"}/>
             </View>
             <View style={{flex: 1, flexDirection: "row"}}>
-                <TouchableOpacity style={styles.calculation} onPress={()=>{add_char("0")}}>
-                    <TexViwer expression={"0"}/>
-                </TouchableOpacity>
-                <View style={styles.calculation}></View>
-                <TouchableOpacity style={styles.calculation} onPress={handleOnPressEval}>
-                    <TexViwer expression={"\\cong"}/>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.calculation} onPress={()=>{}}>
-                    <TexViwer expression={"\\text{Ext}"}/>
-                </TouchableOpacity>
+                <CalcButton onPress={()=>{add_char("0")}} char={"0"}/>
+                <CalcButton char={""}/>
+                <CalcButton onPress={()=>{add_char("\\mathbb{Z}")}} char={"\\mathbb{Z}"}/>
+                <CalcButton onPress={()=>{add_char("\\cong")}} char={"\\cong"}/>
             </View>
         </View>
     </View>);
@@ -262,9 +352,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         borderWidth: 1,
-        // borderColor: "white",
         backgroundColor: "#666",
-        backgroundImage: "linear-gradient(45deg, #333, #444, #888)",
     },
     title: {
         margin: 3,
@@ -283,30 +371,9 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: "white",
         backgroundColor: "#eee",
-        // backgroundImage: "linear-gradient(45deg, #000, #111, #222 50%, #444)",
         alignItems: "center",
         justifyContent: 'center',
         fontSize: 36,
-        // color: "white",
-    },
-    calculation: {
-        margin: 3,
-        flex: 1,
-        borderWidth: 1,
-        borderRadius: 3,
-        borderColor: "white",
-        backgroundColor: "#fff",
-        // backgroundImage: "linear-gradient(45deg, #25aae1, #4481eb, #3f86ed)",
-        backgroundSize: "300% 100%",
-        alignItems: "center",
-        justifyContent: 'center',
-        fontSize: 42,
-        opacity: .95,
-        // color: "var(--glow-color)",
-        // boxShadow: "0 4px 15px 0 rgba(65, 132, 234, 0.75)",
-        // color: "#fff",
-        // transition: "all 0.3s",
-        // boxShadow: "0 0.625em 1em 0 rgba(30, 143, 255, 0.35)",
     },
 });
 
