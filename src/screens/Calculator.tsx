@@ -25,8 +25,8 @@ const Calculator = () => {
         setExpression("ERROR");
     }
     const add_char = (char:string) => {
-        let prev_term_list = term_list;
-        // let result_term_list:string;
+        const prev_term_list = term_list;
+        let result_term_list = prev_term_list;
 
         // 初期化された状態
         // 後に続くもの: 0、数字（0を除く）、演算子
@@ -34,28 +34,28 @@ const Calculator = () => {
             if (char==="0") {
                 ;
             } else if (/[1-9]/.test(char)) {
-                prev_term_list = ["Group", 0, Number(char)];
+                result_term_list = ["Group", 0, Number(char)];
             } else if ("\\mathbb{Z}"===char) {
-                prev_term_list = ["Group", 1, 0];
+                result_term_list = ["Group", 1, 0];
             } else if (["\\otimes", "\\text{Hom}"].includes(char)) {
-                prev_term_list = [char, ["Zero"], []];
+                result_term_list = [char, prev_term_list, []];
             } else {
                 error_expression();
                 return;
             }
-            setTermList(prev_term_list);
+            setTermList(result_term_list);
 
         // 一つ前が自明群
         // 後に続くもの: 演算子
         } else if ("Zero"===prev_term_list[0]) {
             if (["\\otimes", "\\text{Hom}"].includes(char)) {
-                prev_term_list = [char, ["Zero"], []];
+                result_term_list = [char, prev_term_list, []];
             } else if (char==="0") {
                 ;
             } else if (/[1-9]/.test(char)) {
-                prev_term_list = ["Group", 0, Number(char)];
+                result_term_list = ["Group", 0, Number(char)];
             } else if (char==="\\mathbb{Z}") {
-                prev_term_list = ["Group", 1, 0];
+                result_term_list = ["Group", 1, 0];
             } else {
                 console.error("error");
                 console.error("一つ前が自明群");
@@ -68,12 +68,12 @@ const Calculator = () => {
             // 後に続くもの: 数字、演算子
             if (prev_term_list[2]>0) {
                 if (["\\otimes", "\\text{Hom}"].includes(char)) {
-                    if (prev_term_list[2]===1) {prev_term_list=["Zero"]}
-                    prev_term_list = [char, prev_term_list, []];
+                    if (prev_term_list[2]===1) {result_term_list=["Zero"]}
+                    result_term_list = [char, prev_term_list, []];
                 } else if (/[0-9]/.test(char)) {
-                    prev_term_list[2] = Number(prev_term_list[2].toString()+char);
+                    result_term_list[2] = Number(prev_term_list[2].toString()+char);
                 } else if (char==="\\mathbb{Z}") {
-                    prev_term_list = ["Group", 1, 0];
+                    result_term_list = ["Group", 1, 0];
                 } else {
                     console.error("error");
                     console.error("一つ前が有限群");
@@ -84,11 +84,11 @@ const Calculator = () => {
             // 後に続くもの: 数字、演算子
             } else if (prev_term_list[2]===0) {
                 if (["\\otimes", "\\text{Hom}"].includes(char)) {
-                    prev_term_list = [char, prev_term_list, []];
+                    result_term_list = [char, prev_term_list, []];
                 } else if ("0"===char) {
-                    prev_term_list = ["Zero"];
+                    result_term_list = ["Zero"];
                 } else if (/[1-9]/.test(char)) {
-                    prev_term_list = ["Group", 0, Number(char)];
+                    result_term_list = ["Group", 0, Number(char)];
                 } else if (char==="\\mathbb{Z}") {
                     ;
                 } else {
@@ -110,13 +110,13 @@ const Calculator = () => {
             // ２項目が未入力
             if (prev_term_list[2].length===0) {
                 if (char==="0") {
-                    prev_term_list[2] = ["Zero"];
+                    result_term_list[2] = ["Zero"];
                 } else if (/[1-9]/.test(char)) {
-                    prev_term_list[2] = ["Group", 0, Number(char)];
+                    result_term_list[2] = ["Group", 0, Number(char)];
                 } else if (char==="\\mathbb{Z}") {
-                    prev_term_list[2] = ["Group", 1, 0];
+                    result_term_list[2] = ["Group", 1, 0];
                 } else if (["\\otimes", "\\text{Hom}"].includes(char)) {
-                    prev_term_list[0] = char;
+                    result_term_list[0] = char;
                 } else {
                     console.error("error")
                     console.error("一つ前が演算子");
@@ -129,11 +129,11 @@ const Calculator = () => {
                 if (char==="0") {
                     ;
                 } else if (/[1-9]/.test(char)) {
-                    prev_term_list[2] = ["Group", 0, Number(char)];
+                    result_term_list[2] = ["Group", 0, Number(char)];
                 } else if (char==="\\mathbb{Z}") {
-                    prev_term_list[2] = ["Group", 1, 0];
+                    result_term_list[2] = ["Group", 1, 0];
                 } else if (["\\otimes", "\\text{Hom}"].includes(char)) {
-                    prev_term_list = [char, eval_term_list(prev_term_list), []]
+                    result_term_list = [char, eval_term_list(prev_term_list), []]
                 } else {
                     console.error("error")
                     console.error("一つ前が演算子");
@@ -144,11 +144,11 @@ const Calculator = () => {
             // ２項目が有限群
             } else if (prev_term_list[2][2]>0) {
                 if (/[0-9]/.test(char)) {
-                    prev_term_list[2][2] = Number(prev_term_list[2][2].toString()+char);
+                    result_term_list[2][2] = Number(prev_term_list[2][2].toString()+char);
                 } else if (char==="\\mathbb{Z}") {
-                    prev_term_list[2] = ["Group", 1, 0];
+                    result_term_list[2] = ["Group", 1, 0];
                 } else if (["\\otimes", "\\text{Hom}"].includes(char)) {
-                    prev_term_list = [char, eval_term_list(prev_term_list), []]
+                    result_term_list = [char, eval_term_list(prev_term_list), []]
                 } else {
                     console.error("error")
                     console.error("一つ前が演算子");
@@ -159,13 +159,13 @@ const Calculator = () => {
             // ２項目が整数群
             } else if (prev_term_list[2][2]===0) {
                 if (char==="0") {
-                    prev_term_list[2] = ["Zero"];
+                    result_term_list[2] = ["Zero"];
                 } else if (/[1-9]/.test(char)) {
-                    prev_term_list[2] = ["Group", 0, Number(char)];
+                    result_term_list[2] = ["Group", 0, Number(char)];
                 } else if (char==="\\mathbb{Z}") {
                     ;
                 } else if (["\\otimes", "\\text{Hom}"].includes(char)) {
-                    prev_term_list = [char, eval_term_list(prev_term_list), []]
+                    result_term_list = [char, eval_term_list(prev_term_list), []]
                 } else {
                     console.error("error")
                     console.error("一つ前が演算子");
@@ -186,8 +186,8 @@ const Calculator = () => {
             error_expression();
             return;
         }
-        setTermList(prev_term_list);
-        create_expression(prev_term_list);
+        setTermList(result_term_list);
+        create_expression(result_term_list);
         setIsInitialized(false);
     }
 
@@ -204,8 +204,8 @@ const Calculator = () => {
                 return;
             }
 
-            if (lhs[1]==="Zero") {lhs = ["Group", 0, 1]};
-            if (rhs[1]==="Zero") {rhs = ["Group", 0, 1]};
+            if (lhs[0]==="Zero") {lhs = ["Group", 0, 1]};
+            if (rhs[0]==="Zero") {rhs = ["Group", 0, 1]};
 
             if (oper==="\\otimes") {
                 if (lhs[2]===1 || rhs[2]===1) {
