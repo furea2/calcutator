@@ -4,7 +4,7 @@ import { MathJaxSvg } from 'react-native-mathjax-html-to-svg';
 
 
 type TexViwerProps = {
-  expression: string
+  expression: string,
 }
 const TexViwer = (props:TexViwerProps) => {
   return (<MathJaxSvg fontSize={40} fontCache={true}>

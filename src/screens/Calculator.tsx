@@ -32,7 +32,7 @@ const Calculator = () => {
         // 後に続くもの: 0、数字（0を除く）、演算子
         if (is_initialized) {
             if (char==="0") {
-                ;
+                result_term_list = ["Zero"];
             } else if (/[1-9]/.test(char)) {
                 result_term_list = ["Group", 0, Number(char)];
             } else if ("\\mathbb{Z}"===char) {
@@ -326,12 +326,11 @@ const Calculator = () => {
     }
 
     return (<View style={styles.container}>
-        <View style={{height: 20}}></View>
-        <View style={{flex: 1}}>
+        {/* <View style={{flex: 1}}>
             <View style={styles.title}>
-              <TexViwer expression={"\\mathrm{Tensor Calculator}"}/>
+              <TexViwer expression={"\\mathrm{Tensor\\, Calculator}"}/>
             </View>
-        </View>
+        </View> */}
         <View style={{flex: 3}}>
           <LinearGradient
             colors={['#000', '#444', '#555']}
@@ -374,12 +373,14 @@ const styles = StyleSheet.create({
         flex: 1,
         borderWidth: 1,
         backgroundColor: "#666",
+        // marginTop: 20,
     },
     title: {
-        margin: 3,
+        marginRight: 3,
+        marginLeft: 3,
         flex: 1,
-        borderWidth: 2,
-        borderColor: "white",
+        borderWidth: 10,
+        borderColor: "#111",
         backgroundColor: "#eee",
         alignItems: "center",
         justifyContent: 'center',
