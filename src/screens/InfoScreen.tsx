@@ -2,8 +2,32 @@ import React from 'react';
 import { ScrollView, View, Text } from 'moti';
 import { StyleSheet, Button, TouchableOpacity } from 'react-native';
 
-import { MathJaxSvg } from 'react-native-mathjax-html-to-svg';
-
+// import { MathJaxSvg } from 'react-native-mathjax-html-to-svg';
+import MathJax from 'react-native-mathjax';
+const mmlOptions = {
+    messageStyle: "none",
+    extensions: ["tex2jax.js"],
+    jax: ["input/TeX", "output/HTML-CSS"],
+    tex2jax: {
+      inlineMath: [
+        ["$", "$"],
+        ["\\(", "\\)"],
+      ],
+      displayMath: [
+        ["$$", "$$"],
+        ["\\[", "\\]"],
+      ],
+      processEscapes: true,
+    },
+    TeX: {
+      extensions: [
+        "AMSmath.js",
+        "AMSsymbols.js",
+        "noErrors.js",
+        "noUndefined.js",
+      ],
+    },
+  };
 const InfoScreen = () => {
     return (<ScrollView style={styles.container}>
         <View style={{flex: 1}}>
@@ -12,51 +36,22 @@ const InfoScreen = () => {
         <Text style={{fontSize: 24}}> Tensor calculator.</Text>
         <Text>{""}</Text>
         <Text style={{fontSize: 20}}> * Group.</Text>
-        <Text>{""}</Text>
-        <MathJaxSvg fontSize={14} fontCache={true}>{`
-    <p>A group is a set $$G$$ together with a binary operation</p><br/>
-                        <p>$$ G\\times G \\to G\\,,\\ (a, b) \\mapsto a \\ast b $$</p><br/>
-  <p>satisfying the following conditions;</p><br/>
-    <p><b>G1:</b> (assosiativity) for all $$a, b, c \\in G$$,</p><br/>
-                              <p>$$ (a \\ast b) \\ast c = a \\ast (b \\ast c);$$</p><br/>
-    <p><b>G2:</b> (existance of a neutral element) there exists \n an element e ∈ G such that</p><br/><p>&nbsp;</p><br/>
-                                    <p>$$ a \\ast e = a = e \\ast a$$</p><br/>
-    <p>for all a ∈ G;</p><br/>
-    <p><b>G3:</b> (existance of inverses) for each a ∈ G, there \n exists an a' ∈ G such that</p><br/><p>&nbsp;</p><br/>
-                                  <p>$$ a \\ast a' = e = a' \\ast a.$$</p>
+        <MathJax
+            mathJaxOptions={mmlOptions}
+            html={`
+<p>A group is a set $G$ together with a binary operation</p>
+<p>$$ G\\times G \\to G\\,,\\ (a, b) \\mapsto a \\ast b $$</p>
+<p>satisfying the following conditions;</p>
+<p><b>G1:</b> (assosiativity) for all $a, b, c \\in G$,</p>
+<p>$$ (a \\ast b) \\ast c = a \\ast (b \\ast c);$$</p>
+<p><b>G2:</b> (existance of a neutral element) there exists an element $e \\in G$ such that</p>
+<p>$$ a \\ast e = a = e \\ast a$$</p>
+<p>for all a ∈ G;</p>
+<p><b>G3:</b> (existance of inverses) for each $a \\in G$, there exists an $a' \\in G$ such that</p>
+<p>$$ a \\ast a' = e = a' \\ast a.$$</p>
 `}
-        </MathJaxSvg>
+        />
         <Text style={{fontSize: 20}}> * Ring.</Text>
-        <Text>{""}</Text>
-        <MathJaxSvg fontSize={16} fontCache={true}>{`
-    <p>comming soon...</p>
-`}
-        </MathJaxSvg>
-        <Text style={{fontSize: 20}}> * Module.</Text>
-        <Text>{""}</Text>
-        <MathJaxSvg fontSize={16} fontCache={true}>{`
-    <p>comming soon...</p>
-`}
-        </MathJaxSvg>
-        <Text style={{fontSize: 20}}> * Tensor.</Text>
-        <Text>{""}</Text>
-        <MathJaxSvg fontSize={16} fontCache={true}>{`
-    <p>comming soon...</p>
-`}
-        </MathJaxSvg>
-        <Text style={{fontSize: 20}}> * Homomorphism.</Text>
-        <Text>{""}</Text>
-        <MathJaxSvg fontSize={16} fontCache={true}>{`
-    <p>comming soon...</p>
-`}
-        </MathJaxSvg>
-        <Text style={{fontSize: 20}}> * Image and Kernel.</Text>
-        <Text>{""}</Text>
-        <MathJaxSvg fontSize={16} fontCache={true}>{`
-    <p>comming soon...</p>
-`}
-        </MathJaxSvg>
-
         {/* <Button title="Tensor Calculator"
             onPress={()=>navigation.navigate("Tensor Calculator")} />
         <Button title="Function Calculator"

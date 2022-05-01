@@ -6,7 +6,7 @@ import Home from './src/screens/Home';
 import Calculator from './src/screens/Calculator';
 import Function from './src/screens/Function';
 import TreasureScreen from './src/screens/TreasureScreen';
-import InfoScreen from './src/screens/InfoScreen';
+import AboutScreen from './src/screens/AboutScreen';
 
 const Tab = createBottomTabNavigator();
 
@@ -52,7 +52,7 @@ export default function App() {
           }} />
         <Tab.Screen
           name="About"
-          component={InfoScreen}
+          component={AboutScreen}
           options={{
             // headerShown: false,
             tabBarIcon: ({ color,size }) => (
