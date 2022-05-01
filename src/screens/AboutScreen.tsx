@@ -92,8 +92,9 @@ const AboutScreen = () => {
 `}
         />
         <Text>{"\n\n\n"}</Text>
-        <Text style={{fontSize: 11}}>&copy;2022{" furea2 presents."}</Text>        
-        <Text>{""}</Text>
+        <View style={styles.footer}>
+          <Text style={{alignItems: "center",justifyContent: 'center',fontSize: 11}}>&copy;2022{" furea2 presents."}</Text>        
+        </View>
         </View>
         </View>
         </View>
@@ -115,6 +116,18 @@ const styles = StyleSheet.create({
         backgroundColor: "#fff",
         // alignItems: "center",
         // justifyContent: 'center',
+        fontSize: 42,
+        opacity: .95,
+    },
+    footer: {
+        margin: 3,
+        flex: 1,
+        borderWidth: 1,
+        borderRadius: 3,
+        borderColor: "white",
+        backgroundColor: "#fff",
+        alignItems: "center",
+        justifyContent: 'center',
         fontSize: 42,
         opacity: .95,
     },

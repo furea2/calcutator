@@ -27,7 +27,7 @@ const mmlOptions = {
       ],
     },
   };
-const TreasureScreen = ({ navigation }) => {
+const JourneyScreen = ({ navigation }) => {
     return (<ScrollView style={styles.container}>
         <View style={{flex: 1}}>
         <View style={{flex: 1, flexDirection: "row"}}>
@@ -51,7 +51,7 @@ const TreasureScreen = ({ navigation }) => {
 
 
 <h3>・<b>$\\pi_{4}(S^3)$</b></h3>
-<p>In the above sequence, set $i=4$ and $n=2$ and we have</p>
+<p>In the above sequence, for $i=4$ and $n=2$ and we have</p>
 <p>$$\\begin{array}{c}
 \\pi_{5}(S^5) &
     \\overset{\\Delta}{\\rightarrow} & \\pi_{3}(S^2) &
@@ -60,7 +60,7 @@ const TreasureScreen = ({ navigation }) => {
                 \\pi_4(S^5) \\\\
 \\downarrow \\cong &
         & \\downarrow \\cong &
-            & \\Arrowvert & & \\Arrowvert \\\\
+            & \\downarrow \\cong & & \\Arrowvert \\\\
 \\mathbb{Z} &
     \\overset{\\times 2}{\\rightarrow} & \\mathbb{Z} &
         \\rightarrow & ? &
@@ -80,8 +80,8 @@ const TreasureScreen = ({ navigation }) => {
             <Button
                 title={"Function Calculator"}
                 onPress={()=>navigation.navigate("Function Calculator")} />
-            <Text>{"\n\n\n"}</Text>
-            <Text style={{fontSize: 11}}>&copy;2022{" furea2 presents."}</Text>        
+            {/* <Text>{"\n\n\n"}</Text>
+            <Text style={{fontSize: 11}}>&copy;2022{" furea2 presents."}</Text>         */}
         </View>
         </View>
         </View>
@@ -108,4 +108,4 @@ const styles = StyleSheet.create({
     },
 })
 
-export default TreasureScreen;
+export default JourneyScreen;

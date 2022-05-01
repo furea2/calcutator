@@ -5,7 +5,7 @@ import { Ionicons, MaterialCommunityIcons, Entypo } from '@expo/vector-icons';
 import Home from './src/screens/Home';
 import Calculator from './src/screens/Calculator';
 import Function from './src/screens/Function';
-import TreasureScreen from './src/screens/TreasureScreen';
+import JourneyScreen from './src/screens/JourneyScreen';
 import AboutScreen from './src/screens/AboutScreen';
 
 const Tab = createBottomTabNavigator();
@@ -42,8 +42,8 @@ export default function App() {
             )
           }} />
         <Tab.Screen
-          name="Treasure"
-          component={TreasureScreen}
+          name="Journey"
+          component={JourneyScreen}
           options={{
             // headerShown: false,
             tabBarIcon: ({ color,size }) => (
