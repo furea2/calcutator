@@ -4,7 +4,7 @@ import { StyleSheet, Button, TouchableOpacity } from 'react-native';
 
 import { MathJaxSvg } from 'react-native-mathjax-html-to-svg';
 
-const InfoScreen = () => {
+const TreasureScreen = () => {
     return (<ScrollView style={styles.container}>
         <View style={{flex: 1}}>
         <View style={{flex: 1, flexDirection: "row"}}>
@@ -90,4 +90,4 @@ const styles = StyleSheet.create({
     },
 })
 
-export default InfoScreen;
+export default TreasureScreen;
