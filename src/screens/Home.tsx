@@ -16,10 +16,10 @@ const Home = ({navigation}) => {
         <View style={{flex: 1, flexDirection: "row"}}>
         <View style={styles.calculation}>
         <TouchableOpacity style={styles.calculation}
-            onPress={()=>navigation.navigate("Tensor Calculator")} >
+            onPress={()=>navigation.navigate("Tensor Calc")} >
             <Button title="Tensor Calculator"
-                onPress={()=>navigation.navigate("Tensor Calculator")} />
-            <Text>This calculator can calculate the tensor product and morphism set between 1-dim Z-modules.</Text>
+                onPress={()=>navigation.navigate("Tensor Calc")} />
+            <Text>This calculator can calculate the tensor product and morphism set between abel groups.</Text>
         </TouchableOpacity>
         </View>
         </View>
@@ -28,10 +28,22 @@ const Home = ({navigation}) => {
         <View style={{flex: 1, flexDirection: "row"}}>
         <View style={styles.calculation}>
         <TouchableOpacity style={styles.calculation}
-            onPress={()=>navigation.navigate("Function Calculator")} >
+            onPress={()=>navigation.navigate("Function Calc")} >
             <Button title="Function Calculator"
-                onPress={()=>navigation.navigate("Function Calculator")} />
-            <Text>This calculator can calculate the kernel, image and cokernel of the Z-homomorphisms.</Text>
+                onPress={()=>navigation.navigate("Function Calc")} />
+            <Text>This calculator can calculate the kernel, image and cokernel of the group homomorphisms.</Text>
+        </TouchableOpacity>
+        </View>
+        </View>
+        </View>
+        <View style={{flex: 6}}>
+        <View style={{flex: 1, flexDirection: "row"}}>
+        <View style={styles.calculation}>
+        <TouchableOpacity style={styles.calculation}
+            onPress={()=>navigation.navigate("Ext Calc")} >
+            <Button title="Ext Calculator"
+                onPress={()=>navigation.navigate("Ext Calc")} />
+            <Text>This calculator can calculate the ext group of abel groups.</Text>
         </TouchableOpacity>
         </View>
         </View>

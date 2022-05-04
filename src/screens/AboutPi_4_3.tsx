@@ -27,7 +27,7 @@ const mmlOptions = {
       ],
     },
   };
-const JourneyScreen = ({ navigation }) => {
+const AboutPi_4_3 = ({navigation}) => {
     return (<ScrollView style={styles.container}>
         <View style={{flex: 1}}>
         <View style={{flex: 1, flexDirection: "row"}}>
@@ -78,10 +78,9 @@ const JourneyScreen = ({ navigation }) => {
 `}
             />
             <Button
-                title={"Function Calculator"}
-                onPress={()=>navigation.navigate("Function Calculator")} />
-            {/* <Text>{"\n\n\n"}</Text>
-            <Text style={{fontSize: 11}}>&copy;2022{" furea2 presents."}</Text>         */}
+                title={"Go back"}
+                onPress={()=>navigation.goBack()} />
+            <Text>{"\n\n\n"}</Text>
         </View>
         </View>
         </View>
@@ -108,4 +107,4 @@ const styles = StyleSheet.create({
     },
 })
 
-export default JourneyScreen;
+export default AboutPi_4_3;
